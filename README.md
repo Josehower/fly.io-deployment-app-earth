@@ -12,11 +12,11 @@
 5. Create the volume for the app with `flyctl volumes create postgres -s 1`
    - Verify the volume is created with `flyctl volumes list`
 6. Copy to your project the files .dockerignore, Dockerfile and fly.toml from the configuration files repo
-   - Modify `fly.toml` with the name app you choose in step 1
+   - Modify `fly.toml` with the name you defined for the app
 7. Deploy first version of the app with `flyctl deploy`
    - User Frankfurt server location
    - Verify the app is running with `flyctl status`
-8. Add secrets with the database credentials to the project (this are production credentials please make them secure)
+8. Add secrets with the database production credentials to the project (Production credentials should be secure. They will be needed on next steps)
    - Run `flyctl secrets set PGHOST=localhost PGDATABASE=database_name PGPASSWORD=this-should-be-a-secure-password PGUSERNAME=user_name`
 9. Stablish a shh connection with the app with `flyctl ssh console`
 
@@ -33,7 +33,7 @@
      - close vi typing the command `:wq` and hit return/Enter
    - Start the postgres server with `pg_ctl start -D /postgres-volume/data`
    - Start the database cli with `psql -U postgres postgres`
-   - Setup database with secure credentials you added as secrets on step 5
+   - Setup database with secure credentials you added as secrets for the app
      ```sql
        CREATE DATABASE <database name>;
        CREATE USER <user name> WITH ENCRYPTED PASSWORD '<user password>';
