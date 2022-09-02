@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "migrate": "dotenv -c development ley"
+    "migrate": "dotenv -c development ley",
+    "flypostbuild": "su postgres -c 'pg_ctl start -D /postgres-volume/data' && yarn migrate up && yarn start"
   },
   "dependencies": {
     "dotenv-safe": "^8.2.0",
