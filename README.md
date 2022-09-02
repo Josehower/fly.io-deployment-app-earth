@@ -27,10 +27,10 @@
    - Initialize database with `initdb -D /postgres-volume/data`
    - Set up configuration files by running the following commands:
 
-   ```sh
-     echo "host all all ::0/0 trust" >> /postgres-volume/data/pg_hba.conf
-     echo "listen_addresses='*'" >> /postgres-volume/postgresql.conf
-   ```
+     ```sh
+       echo "host all all ::0/0 md5" >> /postgres-volume/data/pg_hba.conf
+       echo "listen_addresses='*'" >> /postgres-volume/postgresql.conf
+     ```
 
    - Update data/postgresql.conf to update unix_socket_directories line to `unix_socket_directories = '/postgres-volume/run'`
      - open vi editor with `vi /postgres-volume/data/postgresql.conf`
@@ -59,26 +59,23 @@
      database_name=#
    ```
 
-````
+   Bad: ❌
 
-Bad: ❌
+   ```sh
+     / $ psql
+     psql (14.5)
+     Type "help" for help.
 
-```sh
-  / $ psql
-  psql (14.5)
-  Type "help" for help.
+     postgres=#
+   ```
 
-  postgres=#
-```
+   - close ssh connection
 
-- close ssh connection
+   10. Create `flypostbuild` yarn script with the value of `su postgres -c 'pg_ctl start -D /postgres-volume/data' && yarn migrate up && yarn start`
+   11. Update the Dockerfile to use the `flypostbuild` script
+   12. Redeploy with `flyctl deploy`
 
-10. Create `flypostbuild` yarn script with the value of `su postgres -c 'pg_ctl start -D /postgres-volume/data' && yarn migrate up && yarn start`
-11. Update the Dockerfile to use the `flypostbuild` script
-12. Redeploy with `flyctl deploy`
+   - The app should deploy with no porblems and the database records should be now available on production
 
-    - The app should deploy with no porblems and the database records should be now available on production
-
-13. Copy to your project the directory .github with all its content from the configuration files repo
-14. Perform some changes to the app commit and push the changes to the repo. Github actions should deploy a new version of your app successfully
-````
+   13. Copy to your project the directory .github with all its content from the configuration files repo
+   14. Perform some changes to the app commit and push the changes to the repo. Github actions should deploy a new version of your app successfully
