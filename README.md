@@ -4,7 +4,7 @@
 2. Get the flyctl auth token:
    - [Create a fly.io account](https://fly.io/app/sign-up)
    - Create a [new fly token](https://fly.io/user/personal_access_tokens) for GitHub actions
-   - Add The secret to the GitHub project repo under the name `FLY_API_TOKEN` https://github.com/<username>/<project-slug>/settings/secrets/actions/new
+   - Add The secret to the GitHub project repo under the name `FLY_API_TOKEN` https://github.com/username/project-slug/settings/secrets/actions/new
 3. On your terminal Install flyctl cli with brew `brew install flyctl`
    - Login to your fly account with `flyctl auth login`
 4. Create a fly app with `flyctl apps create`
