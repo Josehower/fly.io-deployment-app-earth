@@ -1,4 +1,4 @@
-## Earth
+## App1 - Earth (App with postgres volume)
 
 1. Create your Next,js repo as usual following the learning platform instructions.
 2. Get the flyctl auth token:
