@@ -31,9 +31,10 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN apk add postgresql
 
 COPY --from=builder /app ./
-
+RUN chmod +x /app/postgres-init.sh
 
 ENV PORT 8080
 
-CMD ["yarn", "flypostbuild"]
-# CMD ["yarn", "start"]
+# use fly-postbuild instead of start on projects using postgres
+CMD ["yarn", "fly-postbuild"]
+#CMD ["yarn", "start"]

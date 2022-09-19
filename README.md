@@ -17,11 +17,13 @@
    - User Frankfurt server location
    - Verify the app is running with `flyctl status`
 8. Add secrets with the database production credentials to the project (Production credentials should be secure. They will be needed on next steps)
+
    - Run `flyctl secrets set PGHOST=localhost PGDATABASE=database_name PGPASSWORD=this-should-be-a-secure-password PGUSERNAME=user_name`
+
 9. Stablish a shh connection with the app with `flyctl ssh console`
 
    - Check the secrets are correct with `printenv`
-   - Create data and run directories in the postgres volume with `mkdir /postgres-volume/data /postgres-volume/run` (create run dir probably not needed)
+   - Create data and run directories in the postgres volume with `mkdir /postgres-volume/data /postgres-volume/run`
    - Add permisions for postgres user with `chown postgres:postgres /postgres-volume/data /postgres-volume/run`
    - Switch to postgres user with `su postgres -`
    - Initialize database with `initdb -D /postgres-volume/data`
@@ -29,53 +31,60 @@
 
      ```sh
        echo "host all all ::0/0 md5" >> /postgres-volume/data/pg_hba.conf
-       echo "listen_addresses='*'" >> /postgres-volume/postgresql.conf
+       echo "listen_addresses='*'" >> /postgres-volume/data/postgresql.conf
      ```
 
-   - Update data/postgresql.conf to update unix_socket_directories line to `unix_socket_directories = '/postgres-volume/run'`
-     - open vi editor with `vi /postgres-volume/data/postgresql.conf`
-     - move down with arrow keys until the line that contains the porperty `unix_socket_directories`
-     - Update the value to `/postgres-volume/run` (don't forget to activate the insert mode by pressing `i`)
-     - close the insert mode by pressing `Esc`
-     - close vi typing the command `:wq` and hit return/Enter
-   - Start the postgres server with `pg_ctl start -D /postgres-volume/data`
-   - Start the database cli with `psql -U postgres postgres`
-   - Setup database with secure credentials you added as secrets for the app
-     ```sql
-       CREATE DATABASE <database name>;
-       CREATE USER <user name> WITH ENCRYPTED PASSWORD '<user password>';
-       GRANT ALL PRIVILEGES ON DATABASE <database name> TO <user name>;
-     ```
-   - Test the credentials and the database is workign as expected by running `psql`
-   - You should start the psql cli in the database you just created not in postgres root:
+- Update data/postgresql.conf to update unix_socket_directories line to `unix_socket_directories = '/postgres-volume/run'`
 
-   Good: ✅
+sed -i 's/run\/postgresql/postgres-volume\/run/g' /postgres-volume/data/postgresql.conf
 
-   ```sh
-     / $ psql
-     psql (14.5)
-     Type "help" for help.
+- open vi editor with `vi /postgres-volume/data/postgresql.conf`
+- move down with arrow keys until the line that contains the property `unix_socket_directories`
+- Update the value to `/postgres-volume/run` (don't forget to activate the insert mode by pressing `i`)
+- close the insert mode by pressing `Esc`
+- close vi typing the command `:wq` and hit return/Enter
+- Start the postgres server with `pg_ctl start -D /postgres-volume/data`
+- Start the database cli with `psql -U postgres postgres`
+- Setup database with secure credentials you added as secrets for the app
 
-     database_name=#
-   ```
+  ```sql
+    CREATE DATABASE < projectName >;
+    CREATE USER < firstName-lastName >;
+    GRANT ALL PRIVILEGES ON DATABASE < projectName > TO < firstName-lastName >;
+  ```
 
-   Bad: ❌
+- Test the credentials and the database is workign as expected by running `psql`
+- You should start the psql cli in the database you just created not in postgres root:
 
-   ```sh
-     / $ psql
-     psql (14.5)
-     Type "help" for help.
+Good: ✅
 
-     postgres=#
-   ```
+```sh
+  / $ psql
+  psql (14.5)
+  Type "help" for help.
 
-   - close ssh connection
+  database_name=#
+```
 
-   10. Create `flypostbuild` yarn script with the value of `su postgres -c 'pg_ctl start -D /postgres-volume/data' && yarn migrate up && yarn start`
-   11. Update the Dockerfile to use the `flypostbuild` script
-   12. Redeploy with `flyctl deploy`
+Bad: ❌
 
-   - The app should deploy with no porblems and the database records should be now available on production
+```sh
+  / $ psql
+  psql (14.5)
+  Type "help" for help.
 
-   13. Copy to your project the directory .github with all its content from the configuration files repo
-   14. Perform some changes to the app commit and push the changes to the repo. Github actions should deploy a new version of your app successfully
+  postgres=#
+```
+
+wget -qO- https://ipecho.net/plain | xargs echo
+
+- close ssh connection
+
+10. Create `flypostbuild` yarn script with the value of `su postgres -c 'pg_ctl start -D /postgres-volume/data' && yarn migrate up && yarn start`
+11. Update the Dockerfile to use the `flypostbuild` script
+12. Redeploy with `flyctl deploy`
+
+- The app should deploy with no porblems and the database records should be now available on production
+
+13. Copy to your project the directory .github with all its content from the configuration files repo
+14. Perform some changes to the app commit and push the changes to the repo. Github actions should deploy a new version of your app successfully
